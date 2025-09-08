@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة الإدارة</title>
+  <style>
+    body { font-family: Arial; background:#111; color:#fff; text-align:center; }
+    .box { background:#222; padding:20px; margin:20px; border-radius:10px; }
+    button { padding:8px 15px; margin:5px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>لوحة الإدارة</h1>
+
+  <div class="box">
+    <h2>الطلبات الجديدة</h2>
+    <div id="requests"></div>
+  </div>
+
+  <script>
+    function loadRequests(){
+      let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+      let container = document.getElementById("requests");
+      container.innerHTML = "";
+
+      if(requests.length === 0){
+        container.innerHTML = "<p>لا يوجد طلبات حاليا</p>";
+        return;
+      }
+
+      requests.forEach(req=>{
+        container.innerHTML += `
+          <p>👤 ${req.user} - طلب ${req.points} نقطة
+          <button onclick="approve(${req.id})">موافقة</button>
+          <button onclick="reject(${req.id})">رفض</button></p>
+        `;
+      });
+    }
+
+    function approve(id){
+      let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+      let req = requests.find(r => r.id === id);
+      alert("✅ تمت الموافقة على " + req.user + " ("+req.points+" نقطة)");
+      requests = requests.filter(r => r.id !== id);
+      localStorage.setItem("requests", JSON.stringify(requests));
+      loadRequests();
+    }
+
+    function reject(id){
+      let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+      requests = requests.filter(r => r.id !== id);
+      localStorage.setItem("requests", JSON.stringify(requests));
+      loadRequests();
+    }
+
+    loadRequests();
+  </script>
+</body>
+</html>
