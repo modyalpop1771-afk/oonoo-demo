@@ -1,0 +1,42 @@
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  function loadRequests(){
+    db.collection("requests").where("status","==","pending").get().then(snapshot=>{
+      let container = document.getElementById("requests");
+      container.innerHTML = "";
+      snapshot.forEach(doc=>{
+        let data = doc.data();
+        container.innerHTML += `
+          <p>👤 ${data.user} - 📱 ${data.phone} - 🔢 ${data.points}
+          <button onclick="approve('${doc.id}')">موافقة</button>
+          <button onclick="reject('${doc.id}')">رفض</button></p>
+        `;
+      });
+    });
+  }
+
+  function approve(id){
+    db.collection("requests").doc(id).update({status:"approved"});
+    alert("✅ تمت الموافقة");
+    loadRequests();
+  }
+
+  function reject(id){
+    db.collection("requests").doc(id).update({status:"rejected"});
+    alert("❌ تم الرفض");
+    loadRequests();
+  }
+
+  window.onload = loadRequests;
+</script>
